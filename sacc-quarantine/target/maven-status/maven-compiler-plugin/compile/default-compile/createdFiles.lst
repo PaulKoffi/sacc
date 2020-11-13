@@ -1,0 +1,5 @@
+sacc/User.class
+sacc/SendPositionServlet.class
+sacc/Location.class
+sacc/utils/Sha1Hash.class
+sacc/SendProximityMsg.class

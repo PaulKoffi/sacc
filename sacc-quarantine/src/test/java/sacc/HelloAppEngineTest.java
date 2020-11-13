@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Unit tests for {@link HelloAppEngine}.
+ * Unit tests for {@link SendPositionServlet}.
  */
 
 @RunWith(JUnit4.class)
@@ -32,7 +32,7 @@ public class HelloAppEngineTest {
   @Mock private HttpServletRequest mockRequest;
   @Mock private HttpServletResponse mockResponse;
   private StringWriter responseWriter;
-  private HelloAppEngine servletUnderTest;
+  private SendPositionServlet servletUnderTest;
 
   @Before
   public void setUp() throws Exception {
@@ -46,26 +46,17 @@ public class HelloAppEngineTest {
     responseWriter = new StringWriter();
     when(mockResponse.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
-    servletUnderTest = new HelloAppEngine();
+    servletUnderTest = new SendPositionServlet();
   }
 
   @After public void tearDown() {
     helper.tearDown();
   }
 
-  @Test
-  public void doGet_writesResponse() throws Exception {
-    servletUnderTest.doGet(mockRequest, mockResponse);
-
-    // We expect our hello world response.
-    assertThat(responseWriter.toString())
-        .named("HelloAppEngine response")
-        .contains("Hello App Engine - Standard ");
-  }
 
   @Test
   public void HelloInfo_test() {
-    String result = HelloAppEngine.getInfo();
+    String result = SendPositionServlet.getInfo();
     assertThat(result)
       .named("HelloAppEngine.getInfo")
       .containsMatch("^Version:\\s+.+OS:\\s+.+User:\\s");
