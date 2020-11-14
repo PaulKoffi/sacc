@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "Statistiques", value = "/statistiques/numberOfUsers")
+@WebServlet(name = "NumberOfUsersStatistique", value = "/statistiques/numberOfUsers")
 public class NumberOfUsersStatistique extends HttpServlet {
 
   private Gson _gson = new Gson();
