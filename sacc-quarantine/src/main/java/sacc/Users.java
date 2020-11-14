@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
+import static sacc.mocks.Statistiques.incrementNumberOfUser;
+
 @WebServlet(name = "SendProximityMsg",
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/users"
@@ -75,6 +77,7 @@ public class Users extends HttpServlet {
         data.put("personOfInterest", user.getPersonOfInterest());
 
         ApiFuture<WriteResult> result = docRef.set(data);
+        incrementNumberOfUser();
 // ...
 // result.get() blocks on response
         try {
