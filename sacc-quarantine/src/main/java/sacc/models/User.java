@@ -1,4 +1,4 @@
-package sacc;
+package sacc.models;
 
 import sacc.utils.Sha1Hash;
 
@@ -11,7 +11,7 @@ public class User {
 
 
 
-    public User(String number, String email, Boolean personOfInterest) throws NoSuchAlgorithmException {
+    public User(String number, String email, Boolean personOfInterest) {
         this.phoneNumber = number;
         this.email = email;
         this.personOfInterest = personOfInterest;

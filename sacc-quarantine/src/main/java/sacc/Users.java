@@ -9,6 +9,7 @@ import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
+import sacc.models.User;
 import sacc.utils.Sha1Hash;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
