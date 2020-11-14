@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Unit tests for {@link SendPositionServlet}.
+ * Unit tests for {@link UserQueue}.
  */
 
 @RunWith(JUnit4.class)
@@ -32,7 +32,7 @@ public class HelloAppEngineTest {
   @Mock private HttpServletRequest mockRequest;
   @Mock private HttpServletResponse mockResponse;
   private StringWriter responseWriter;
-  private SendPositionServlet servletUnderTest;
+  private UserQueue servletUnderTest;
 
   @Before
   public void setUp() throws Exception {
@@ -46,7 +46,7 @@ public class HelloAppEngineTest {
     responseWriter = new StringWriter();
     when(mockResponse.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
-    servletUnderTest = new SendPositionServlet();
+    servletUnderTest = new UserQueue();
   }
 
   @After public void tearDown() {
@@ -56,7 +56,7 @@ public class HelloAppEngineTest {
 
   @Test
   public void HelloInfo_test() {
-    String result = SendPositionServlet.getInfo();
+    String result = UserQueue.getInfo();
     assertThat(result)
       .named("HelloAppEngine.getInfo")
       .containsMatch("^Version:\\s+.+OS:\\s+.+User:\\s");

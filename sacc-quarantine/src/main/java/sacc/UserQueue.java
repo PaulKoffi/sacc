@@ -23,22 +23,13 @@ import sacc.utils.Sha1Hash;
 
 @WebServlet(name = "SendPositionServlet",
         description = "taskqueue: Enqueue a two positions with a key",
-        urlPatterns = "/taskqueue/sendPosition"
+        urlPatterns = "/taskqueue/users"
         )
-public class SendPositionServlet extends HttpServlet {
+public class UserQueue extends HttpServlet {
 
   private Gson _gson = null;
-  //a utility method to send object
-  //as JSON response
-  private void sendAsJson(
-          HttpServletResponse response,
-          Object obj) throws IOException {
-    response.setContentType("application/json");
-    String res = _gson.toJson(obj);
-    PrintWriter out = response.getWriter();
-    out.print(res);
-    out.flush();
-  }
+
+
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
@@ -50,19 +41,11 @@ public class SendPositionServlet extends HttpServlet {
       buffer.append(line);
     }
     String payload = buffer.toString();
-//    System.out.println("Payload " + payload);
-    Gson gson = new Gson();
 
-    JsonObject object = gson.fromJson(payload, JsonObject.class);
-    String phoneNumber = Sha1Hash.encryptThisString(object.get("phoneNumber").toString());
-    System.out.println(phoneNumber);
 
-    Properties properties = System.getProperties();
+    Queue queue = QueueFactory.getQueue("users-queue");
+    queue.add(TaskOptions.Builder.withUrl("/users").payload(payload));
 
-    Queue queue = QueueFactory.getDefaultQueue();
-    queue.add(TaskOptions.Builder.withUrl("/sendProximity").param("phoneNumber", phoneNumber));
-
-    response.sendRedirect("/");
   }
 
   public static String getInfo() {
@@ -71,4 +54,13 @@ public class SendPositionServlet extends HttpServlet {
           + " User: " + System.getProperty("user.name");
   }
 
+  private void sendAsJson(
+          HttpServletResponse response,
+          Object obj) throws IOException {
+    response.setContentType("application/json");
+    String res = _gson.toJson(obj);
+    PrintWriter out = response.getWriter();
+    out.print(res);
+    out.flush();
+  }
 }
