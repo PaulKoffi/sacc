@@ -28,7 +28,7 @@ public class InitUsersQueue extends HttpServlet {
             throws ServletException, IOException {
 
 
-        for (int index =100; index < 201; index++){
+        for (int index =100; index < 1000; index++){
             String res = _gson.toJson(new User("077779"+index,"florian.ainadou"+index+"@gmail.com", false));
             Queue queue = QueueFactory.getQueue("users-queue");
             queue.add(TaskOptions.Builder.withUrl("/user").payload(res));
