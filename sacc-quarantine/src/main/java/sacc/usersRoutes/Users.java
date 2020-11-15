@@ -22,9 +22,10 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static sacc.mocks.Statistiques.incrementNumberOfUser;
+
 
 @WebServlet(name = "users",
-
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/users"
 )
@@ -63,12 +64,12 @@ public class Users extends HttpServlet {
 
         DocumentReference docRef = db.collection("users").document(Sha1Hash.encryptThisString(phoneNumber));
         Map<String, Object> data = new HashMap<>();
-        data.put("email", user.getEmail());
-        data.put("personOfInterest", user.getPersonOfInterest());
-        data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
+        if (user.getEmail() != null) data.put("email", user.getEmail());
+        if (user.getPersonOfInterest()!=null) data.put("personOfInterest", user.getPersonOfInterest());
+        if (!user.getNumber().equals(""))data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
 
         ApiFuture<WriteResult> result = docRef.set(data);
-        //incrementNumberOfUser();
+        incrementNumberOfUser();
 // ...
 // result.get() blocks on response
 
@@ -98,6 +99,11 @@ public class Users extends HttpServlet {
         }
         users.forEach((User user) ->  System.out.println("============>"+ user.getEmail() + "============>"+user.getNumber() + "============>"+user.getPersonOfInterest()));
         sendAsJson(response, users);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPut(req, resp);
     }
 
     public static String getInfo() {

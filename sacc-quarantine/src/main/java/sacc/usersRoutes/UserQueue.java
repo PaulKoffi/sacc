@@ -21,7 +21,7 @@ import com.google.appengine.repackaged.com.google.gson.GsonBuilder;
 import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import sacc.utils.Sha1Hash;
 
-@WebServlet(name = "SendPositionServlet",
+@WebServlet(name = "userQueue",
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/taskqueue/user"
         )
