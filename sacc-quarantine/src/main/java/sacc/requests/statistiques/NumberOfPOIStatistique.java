@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 @WebServlet(name = "NumberOfPOIStatistique", value = "/statistiques/numberOfPOI")
@@ -57,7 +58,7 @@ public class NumberOfPOIStatistique extends HttpServlet {
             System.out.println("No such document!");
         }
 
-        sendAsJson(response,document.getData());
+        sendAsJson(response, Objects.requireNonNull(document.getData()).get("numberOfPOI"));
     }
 
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
