@@ -21,26 +21,18 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
+
 @WebServlet(name = "NumberOfUsersStatistique", value = "/statistiques/numberOfUsers")
 public class NumberOfUsersStatistique extends HttpServlet {
 
   private Gson _gson = new Gson();
   private Firestore firestoreDb;
 
-  public NumberOfUsersStatistique() throws IOException {
-    GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-    FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredentials(credentials)
-            .setProjectId("sacc-quarantine")
-            .build();
-    FirebaseApp.initializeApp(options);
-
-    firestoreDb = FirestoreClient.getFirestore();
-  }
-
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
+
+    connectToDatabase();
 
     DocumentReference docRef = firestoreDb.collection("statistics").document("sacc");
 // asynchronously retrieve the document
@@ -69,6 +61,19 @@ public class NumberOfUsersStatistique extends HttpServlet {
     PrintWriter out = response.getWriter();
     out.print(res);
     out.flush();
+  }
+  private void connectToDatabase() throws IOException {
+    if (FirebaseApp.getApps().isEmpty()) {
+      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+      FirebaseOptions options = new FirebaseOptions.Builder()
+              .setCredentials(credentials)
+              .setProjectId("sacc-quarantine")
+              .build();
+      FirebaseApp.initializeApp(options);
+    }else{
+      FirebaseApp.getInstance();
+    }
+    firestoreDb = FirestoreClient.getFirestore();
   }
 
 }
