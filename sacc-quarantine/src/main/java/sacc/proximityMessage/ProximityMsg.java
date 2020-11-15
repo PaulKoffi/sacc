@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
@@ -23,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static sacc.mocks.Statistiques.incrementNumberOfUser;
 
@@ -60,18 +62,45 @@ public class ProximityMsg extends HttpServlet {
 
         String id = Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()+proximity.getUser2PhoneNumber());
 
-        DocumentReference docRef = db.collection("proximity").document(Sha1Hash.encryptThisString(id));
-        Map<String, Object> data = new HashMap<>();
-        data.put("user1CurrentLocation", proximity.getUser1CurrentLocation());
-        data.put("User2CurrentLocation", proximity.getUser2CurrentLocation());
-        data.put("user1PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()));
-        data.put("user2PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        Date date = new Date(System.currentTimeMillis());
-        data.put("date",formatter.format(date));
+        DocumentReference docRefFirstUser = db.collection("users").document(Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()));
 
-        ApiFuture<WriteResult> result = docRef.set(data);
-        incrementNumberOfUser();
+        ApiFuture<DocumentSnapshot> future = docRefFirstUser.get();
+
+        DocumentSnapshot documentFistUser = null;
+        try {
+            documentFistUser = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        DocumentReference docRefSecondUser = db.collection("users").document(Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
+        ApiFuture<DocumentSnapshot> future2 = docRefSecondUser.get();
+        DocumentSnapshot documentSecondUser = null;
+        try {
+            documentSecondUser = future2.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        assert documentFistUser != null;
+        if (documentFistUser.exists()) {
+            assert documentSecondUser != null;
+            if (documentSecondUser.exists()) {
+
+                DocumentReference docRef = db.collection("proximity").document(Sha1Hash.encryptThisString(id));
+                Map<String, Object> data = new HashMap<>();
+                data.put("user1CurrentLocation", proximity.getUser1CurrentLocation());
+                data.put("User2CurrentLocation", proximity.getUser2CurrentLocation());
+                data.put("user1PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()));
+                data.put("user2PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                Date date = new Date(System.currentTimeMillis());
+                data.put("date", formatter.format(date));
+
+                ApiFuture<WriteResult> result = docRef.set(data);
+            }
+        }
     }
 
 }
