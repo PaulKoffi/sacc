@@ -24,21 +24,13 @@ public class NumberOfPOIStatistique extends HttpServlet {
 
     private Gson _gson = new Gson();
     private Firestore firestoreDb;
-
-    public NumberOfPOIStatistique() throws IOException {
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(credentials)
-                .setProjectId("sacc-quarantine")
-                .build();
-        FirebaseApp.initializeApp(options);
-
-        firestoreDb = FirestoreClient.getFirestore();
+    public NumberOfPOIStatistique() {
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        connectToDatabase();
 
         DocumentReference docRef = firestoreDb.collection("statistics").document("sacc");
 // asynchronously retrieve the document
@@ -69,4 +61,17 @@ public class NumberOfPOIStatistique extends HttpServlet {
         out.flush();
     }
 
+    private void connectToDatabase() throws IOException {
+        if (FirebaseApp.getApps().isEmpty()) {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .setProjectId("sacc-quarantine")
+                    .build();
+            FirebaseApp.initializeApp(options);
+        }else{
+            FirebaseApp.getInstance();
+        }
+        firestoreDb = FirestoreClient.getFirestore();
+    }
 }
