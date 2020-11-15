@@ -1,5 +1,4 @@
-package sacc.adminRoutes;
-
+package sacc.usersRoutes;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -14,12 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-@WebServlet(name = "adminQueue",
+@WebServlet(name = "changePositionQueue",
         description = "taskqueue: Enqueue a two positions with a key",
-        urlPatterns = "/taskqueue/admin"
+        urlPatterns = "/taskqueue/changePosition"
 )
-public class AdminQueue extends HttpServlet {
-    private Gson _gson = null;
+public class ChangePositionQueue extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -35,10 +33,8 @@ public class AdminQueue extends HttpServlet {
 
 
         Queue queue = QueueFactory.getDefaultQueue();
-        queue.add(TaskOptions.Builder.withUrl("/admin").payload(payload));
+        queue.add(TaskOptions.Builder.withUrl("/changePosition").method(TaskOptions.Method.PUT).payload(payload));
         response.getWriter().print("Done");
+
     }
-
-
-
 }

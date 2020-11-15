@@ -63,6 +63,8 @@ public class Users extends HttpServlet {
         Map<String, Object> data = new HashMap<>();
         if (user.getEmail() != null) data.put("email", user.getEmail());
         if (user.getPersonOfInterest() != null) data.put("personOfInterest", user.getPersonOfInterest());
+        data.put("location", user.getLocation());
+        data.put("numberOfModification", user.getNumberOfModification());
         if (!user.getNumber().equals("")) data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
 
         ApiFuture<WriteResult> result = docRef.set(data);

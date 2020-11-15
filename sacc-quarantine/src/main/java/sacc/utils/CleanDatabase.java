@@ -25,6 +25,7 @@ public class CleanDatabase extends HttpServlet {
         queue.add(TaskOptions.Builder.withUrl("/user").method(TaskOptions.Method.DELETE));
         queue.add(TaskOptions.Builder.withUrl("/admin").method(TaskOptions.Method.DELETE));
         queue.add(TaskOptions.Builder.withUrl("/sendProximityMsg").method(TaskOptions.Method.DELETE));
+        queue.add(TaskOptions.Builder.withUrl("/uploadStatsFile").method(TaskOptions.Method.DELETE));
 
     }
 }
