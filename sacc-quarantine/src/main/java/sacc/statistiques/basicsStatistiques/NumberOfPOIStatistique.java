@@ -9,12 +9,15 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.gson.GsonBuilder;
 import sacc.models.Statistique;
+import sacc.utils.Sha1Hash;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -31,36 +34,46 @@ public class NumberOfPOIStatistique extends HttpServlet {
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         connectToDatabase();
 
-        Iterable<DocumentReference> docRef = firestoreDb.collection("users").listDocuments();
-        docRef.forEach(documentReference -> {
-            ApiFuture<DocumentSnapshot> future = documentReference.get();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String payload = buffer.toString();
+
+        if(checkIfAdmin(payload)){
+            Iterable<DocumentReference> docRef = firestoreDb.collection("users").listDocuments();
+            docRef.forEach(documentReference -> {
+                ApiFuture<DocumentSnapshot> future = documentReference.get();
 // ...
 // future.get() blocks on response
-            DocumentSnapshot document = null;
-            try {
-                document = future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-            assert document != null;
-            if (document.exists()) {
-                Map<String, Object> map = document.getData();
-                assert map != null;
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    if(entry.getValue().equals(true)){
-                        numberOfPOI++;
-                    }
+                DocumentSnapshot document = null;
+                try {
+                    document = future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
-            } else {
-                System.out.println("No such document!");
-            }
-        });
-        Statistique statistique = new Statistique("number of users", numberOfPOI);
-        sendAsJson(response, Objects.requireNonNull(statistique));
+                assert document != null;
+                if (document.exists()) {
+                    Map<String, Object> map = document.getData();
+                    assert map != null;
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        if(entry.getValue().equals(true)){
+                            numberOfPOI++;
+                        }
+                    }
+                } else {
+                    System.out.println("No such document!");
+                }
+            });
+            Statistique statistique = new Statistique("number of POI", numberOfPOI);
+            sendAsJson(response, Objects.requireNonNull(statistique));
+        }
     }
 
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
@@ -83,5 +96,21 @@ public class NumberOfPOIStatistique extends HttpServlet {
             FirebaseApp.getInstance();
         }
         firestoreDb = FirestoreClient.getFirestore();
+    }
+
+    private boolean checkIfAdmin(String emailAdmin){
+
+        DocumentReference docRefAdmin = firestoreDb.collection("admins").document(Sha1Hash.encryptThisString(emailAdmin));
+
+        ApiFuture<DocumentSnapshot> future = docRefAdmin.get();
+
+        DocumentSnapshot document = null;
+        try {
+            document = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println(document != null);
+        return document != null;
     }
 }
