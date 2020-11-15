@@ -34,8 +34,8 @@ public class addPersonOfInterest extends HttpServlet {
         String payload = buffer.toString();
 
 
-        Queue queue = QueueFactory.getQueue("users-queue");
-        queue.add(TaskOptions.Builder.withUrl("/user/putUserOfInterest").payload(payload));
+        Queue queue = QueueFactory.getDefaultQueue();     //getQueue("users-queue");
+            queue.add(TaskOptions.Builder.withUrl("/user").method(TaskOptions.Method.PUT).payload(payload));
 
     }
 }

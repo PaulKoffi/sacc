@@ -21,13 +21,14 @@ import com.google.appengine.repackaged.com.google.gson.GsonBuilder;
 import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import sacc.utils.Sha1Hash;
 
-@WebServlet(name = "userQueue",
+@WebServlet(name = "SendPositionServlet",
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/taskqueue/user"
         )
 public class UserQueue extends HttpServlet {
 
   private Gson _gson = null;
+
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response)

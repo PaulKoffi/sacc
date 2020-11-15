@@ -2,8 +2,11 @@ package sacc.usersRoutes;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.google.appengine.repackaged.com.google.gson.JsonElement;
+import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.gson.GsonBuilder;
 import sacc.models.User;
 import sacc.utils.Sha1Hash;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -19,15 +22,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static sacc.mocks.Statistiques.incrementNumberOfUser;
 
 
-@WebServlet(name = "users",
+@WebServlet(name = "user",
         description = "taskqueue: Enqueue a two positions with a key",
-        urlPatterns = "/users"
+        urlPatterns = "/user"
 )
 public class Users extends HttpServlet {
     Firestore db;
@@ -69,7 +74,7 @@ public class Users extends HttpServlet {
         if (!user.getNumber().equals(""))data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
 
         ApiFuture<WriteResult> result = docRef.set(data);
-        incrementNumberOfUser();
+//        incrementNumberOfUser();
 // ...
 // result.get() blocks on response
 
@@ -84,27 +89,77 @@ public class Users extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<User> users = new ArrayList<>();
-        ApiFuture<QuerySnapshot> result = db.collection("users").get();
-        List<QueryDocumentSnapshot> documents = null;
+        String phoneNumber = request.getParameter("phoneNumber");
+
+        DocumentReference docRef = db.collection("users").document(Sha1Hash.encryptThisString(phoneNumber));
+
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+
+        DocumentSnapshot document = null;
         try {
-            documents = result.get().getDocuments();
+            document = future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        assert documents != null;
-        for (DocumentSnapshot document : documents) {
 
-            users.add(document.toObject(User.class));
+        assert document != null;
+        if (document.exists()) {
+//            User user = _gson.fromJson( document.getData(), User.class);
+            GsonBuilder builder = new GsonBuilder();
+//            String s= document.getData().toString();
+            response.getWriter().println(document.getData());
+        } else {
+            System.out.println("No such document!");
         }
-        users.forEach((User user) ->  System.out.println("============>"+ user.getEmail() + "============>"+user.getNumber() + "============>"+user.getPersonOfInterest()));
-        sendAsJson(response, users);
+
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ApiFuture<QuerySnapshot> result = db.collection("users").get();
+        List<QueryDocumentSnapshot> documents = null;
+        try {
+            documents= result.get().getDocuments();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        if (documents!=null){
+            for (DocumentSnapshot document : documents) {
+                document.getReference().delete();
+            }
+        }
+
     }
+
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String payload = buffer.toString();
+
+        Gson gson = new Gson();
+
+        User user = gson.fromJson(payload, User.class);
+        String phoneNumber = user.getNumber();
+        Map<String, Object> data = new HashMap<>();
+        data.put("personOfInterest", user.getPersonOfInterest());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        data.put("setAsPOIAtDate",formatter.format(date));
+
+        ApiFuture<WriteResult> writeResult = db.collection("users")
+                .document(Sha1Hash.encryptThisString(phoneNumber))
+                .set(data, SetOptions.merge());
+//                .collection("users").document(Sha1Hash.encryptThisString(phoneNumber).set(data, SetOptions.merge());
+
+
+    }
+
 
     public static String getInfo() {
         return "Version: " + System.getProperty("java.version")
@@ -112,14 +167,13 @@ public class Users extends HttpServlet {
                 + " User: " + System.getProperty("user.name");
     }
 
-    private void sendAsJson(
+    public void sendAsJson(
             HttpServletResponse response,
             Object obj) throws IOException {
         response.setContentType("application/json");
-        String res = _gson.toJson(obj);
-        System.out.println("666666666       "+res);
+
         PrintWriter out = response.getWriter();
-        out.print(res);
+        out.print(obj.toString());
         out.flush();
     }
 }

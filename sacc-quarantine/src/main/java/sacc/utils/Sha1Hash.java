@@ -10,27 +10,14 @@ public class Sha1Hash {
     public static String encryptThisString(String input)
     {
         try {
-            // getInstance() method is called with algorithm SHA-1
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-
-            // digest() method is called
-            // to calculate message digest of the input string
-            // returned as array of byte
-            byte[] messageDigest = md.digest(input.getBytes());
-
-            // Convert byte array into signum representation
-            BigInteger no = new BigInteger(1, messageDigest);
-
-            // Convert message digest into hex value
-            String hashtext = no.toString(16);
-
-            // Add preceding 0s to make it 32 bit
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
+            MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+            byte[] result = mDigest.digest(input.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < result.length; i++) {
+                sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
             }
 
-            // return the HashText
-            return hashtext;
+            return sb.toString();
         }
 
         // For specifying wrong message digest algorithms
