@@ -10,6 +10,11 @@ public class User {
     private Boolean personOfInterest;
 
 
+    public User(){
+        phoneNumber="";
+        email="";
+        personOfInterest=false;
+    }
 
     public User(String number, String email, Boolean personOfInterest) {
         this.phoneNumber = number;

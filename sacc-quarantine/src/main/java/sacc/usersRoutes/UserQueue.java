@@ -1,4 +1,4 @@
-package sacc;
+package sacc.usersRoutes;
 
 import com.google.appengine.api.utils.SystemProperty;
 
@@ -23,12 +23,11 @@ import sacc.utils.Sha1Hash;
 
 @WebServlet(name = "SendPositionServlet",
         description = "taskqueue: Enqueue a two positions with a key",
-        urlPatterns = "/taskqueue/users"
+        urlPatterns = "/taskqueue/user"
         )
 public class UserQueue extends HttpServlet {
 
   private Gson _gson = null;
-
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -47,6 +46,8 @@ public class UserQueue extends HttpServlet {
     queue.add(TaskOptions.Builder.withUrl("/users").payload(payload));
 
   }
+
+
 
   public static String getInfo() {
     return "Version: " + System.getProperty("java.version")

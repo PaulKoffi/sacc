@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import sacc.usersRoutes.UserQueue;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
