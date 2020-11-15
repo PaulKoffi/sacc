@@ -17,6 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -26,6 +30,7 @@ public class NumberOfUsersStatistique extends HttpServlet {
 
   private Gson _gson = new Gson();
   private Firestore firestoreDb;
+  private int numberOfUsers = 0;
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,24 +38,30 @@ public class NumberOfUsersStatistique extends HttpServlet {
 
     connectToDatabase();
 
-    DocumentReference docRef = firestoreDb.collection("statistics").document("sacc");
-// asynchronously retrieve the document
-    ApiFuture<DocumentSnapshot> future = docRef.get();
+    //connectToDatabase();
+    Iterable<DocumentReference> docRef = firestoreDb.collection("users").listDocuments();
+    docRef.forEach(documentReference -> {
+      ApiFuture<DocumentSnapshot> future = documentReference.get();
 // ...
 // future.get() blocks on response
-    DocumentSnapshot document = null;
-    try {
-      document = future.get();
-    } catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-    }
-    assert document != null;
-    if (document.exists()) {
-      System.out.println("Document data: " + document.getData());
-    } else {
-      System.out.println("No such document!");
-    }
-    Statistique statistique = new Statistique("number of users", Math.toIntExact((Long) Objects.requireNonNull(document.getData()).get("numberOfUsers")));
+      DocumentSnapshot document = null;
+      try {
+        document = future.get();
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+      }
+      assert document != null;
+      if (document.exists()) {
+        Map<String, Object> map = document.getData();
+        assert map != null;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+          numberOfUsers++;
+        }
+      } else {
+        System.out.println("No such document!");
+      }
+    });
+    Statistique statistique = new Statistique("number of users", numberOfUsers);
     sendAsJson(response, Objects.requireNonNull(statistique));
   }
 
