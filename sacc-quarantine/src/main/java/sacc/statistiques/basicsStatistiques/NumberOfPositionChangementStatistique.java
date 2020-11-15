@@ -1,4 +1,4 @@
-package sacc.requests.statistiques;
+package sacc.statistiques.basicsStatistiques;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
@@ -19,19 +19,20 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-@WebServlet(name = "NumberOfPOIStatistique", value = "/statistiques/numberOfPOI")
-public class NumberOfPOIStatistique extends HttpServlet {
+@WebServlet(name = "NumberOfPositionChangementStatistique", value = "/statistiques/NumberOfPositionChangement")
+public class NumberOfPositionChangementStatistique extends HttpServlet {
 
     private Gson _gson = new Gson();
     private Firestore firestoreDb;
-    public NumberOfPOIStatistique() {
+
+    public NumberOfPositionChangementStatistique() throws IOException {
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        connectToDatabase();
 
+        connectToDatabase();
         DocumentReference docRef = firestoreDb.collection("statistics").document("sacc");
 // asynchronously retrieve the document
         ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -50,7 +51,7 @@ public class NumberOfPOIStatistique extends HttpServlet {
             System.out.println("No such document!");
         }
 
-        sendAsJson(response, Objects.requireNonNull(document.getData()).get("numberOfPOI"));
+        sendAsJson(response, Objects.requireNonNull(document.getData()).get("numberOfPositionChangement"));
     }
 
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {

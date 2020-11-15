@@ -1,4 +1,4 @@
-package sacc.requests.statistiques;
+package sacc.statistiques.basicsStatistiques;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
@@ -9,8 +9,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import sacc.mocks.Statistiques;
-import sacc.models.Statistique;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
