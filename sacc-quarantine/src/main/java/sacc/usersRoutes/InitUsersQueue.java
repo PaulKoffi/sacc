@@ -38,8 +38,11 @@ public class InitUsersQueue extends HttpServlet {
 
         }
 
-        String res2 = _gson.toJson(new Admin("Paul", "pkoffi5@gmail.com"));
+        String res2 = _gson.toJson(new Admin("Paul", "koffixxxx@gmail.com"));
         queue.add(TaskOptions.Builder.withUrl("/admin").payload(res2));
+
+        String res4 = _gson.toJson(new Admin("Paulmarie Djekinnou", "paulmarie.djekinnou@gmail.com"));
+        queue.add(TaskOptions.Builder.withUrl("/admin").payload(res4));
 
         for (int index =100; index < 200; index++){
 
