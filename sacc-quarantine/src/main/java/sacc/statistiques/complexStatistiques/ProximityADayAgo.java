@@ -55,7 +55,7 @@ public class ProximityADayAgo extends HttpServlet {
             String messageId = messageIdFuture.get();
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
-            lastProximitiesSub.subscribeAsyncExample(projectId,payload);
+            lastProximitiesSub.subscribeAsyncExample(projectId);
             //lastProximitiesSub.getUserMailsList();
             /**
              * Mettre ton code ici
