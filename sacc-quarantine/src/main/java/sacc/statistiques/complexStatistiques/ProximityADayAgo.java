@@ -23,6 +23,9 @@ public class ProximityADayAgo extends HttpServlet {
 
     private LastProximitiesSub lastProximitiesSub = new LastProximitiesSub();
 
+    public ProximityADayAgo() throws IOException {
+    }
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -47,7 +50,6 @@ public class ProximityADayAgo extends HttpServlet {
             // Once published, returns a server-assigned message id (unique within the topic)
             ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
             String messageId = messageIdFuture.get();
-            System.out.println("Published message ID: " + messageId);
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
             lastProximitiesSub.subscribeAsyncExample(projectId);
