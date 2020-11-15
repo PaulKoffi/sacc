@@ -23,6 +23,7 @@ import java.util.concurrent.TimeoutException;
 public class LastProximitiesSub {
 
     private Firestore firestoreDb;
+    public static List<String> userMailsList = new ArrayList<>();
     LastProximitiesSub() throws IOException {
         connectToDatabase();
     }
@@ -46,6 +47,7 @@ public class LastProximitiesSub {
             subscriber.startAsync().awaitRunning();
             List<DocumentReference> docs = filterByDate();
             Set<String> usersMail = checkProximity(docs);
+            userMailsList.addAll(usersMail);
             /**
              * c'est ici que tu dois copier le truc dans le fichier dans une fonction
              * pour après upload dans le cloudsotre
@@ -150,9 +152,6 @@ public class LastProximitiesSub {
             } else {
                 System.out.println("No such document!");
             }
-            /*for(DocumentReference doc:documentReferences){
-                System.out.println(doc);
-            }*/
         });
         for (String mail:emails) {
             System.out.println(mail);
