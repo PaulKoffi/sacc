@@ -1,6 +1,8 @@
 package sacc.usersRoutes;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.core.ApiFuture;
+import com.google.appengine.api.search.DateUtil;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -15,6 +17,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import sacc.models.User;
 import sacc.utils.Sha1Hash;
+import sun.util.calendar.BaseCalendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,6 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +71,8 @@ public class PutUserOfInterest extends HttpServlet {
         String phoneNumber = user.getNumber();
         Map<String, Object> data = new HashMap<>();
         data.put("personOfInterest", user.getPersonOfInterest());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        data.put("setAsPOIAtDate", formatter.format(LocalDate.now()));
 
         ApiFuture<WriteResult> writeResult = db.collection("users")
                 .document(Sha1Hash.encryptThisString(phoneNumber))
