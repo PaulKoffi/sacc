@@ -165,8 +165,7 @@ public class LastProximitiesSub {
         for (DocumentSnapshot document : documents) {
             Map<String, Object> map = document.getData();
             assert map != null;
-            Boolean personOfInterest = (Boolean) map.get("personOfInterest");
-            return personOfInterest;
+            return (Boolean) map.get("personOfInterest");
         }
         return false;
     }
