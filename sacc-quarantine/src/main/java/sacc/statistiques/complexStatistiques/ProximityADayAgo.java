@@ -2,7 +2,8 @@ package sacc.statistiques.complexStatistiques;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
-import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -20,6 +21,7 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import sacc.utils.Sha1Hash;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -70,11 +72,9 @@ public class ProximityADayAgo extends HttpServlet {
             ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
             String messageId = messageIdFuture.get();
             // redirect to home page
-            sendAsJson(resp, resp.getStatus());
-            lastProximitiesSub.subscribeAsyncExample(projectId);
-
-
-            ;
+            sendAsJson(resp,resp.getStatus());
+            lastProximitiesSub.subscribeAsyncExample(projectId,payload);
+            //lastProximitiesSub.getUserMailsList();
             /**
              * Mettre ton code ici
              */

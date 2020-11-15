@@ -4,6 +4,9 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import sacc.Location;
+import sacc.models.Admin;
+import sacc.models.Proximity;
 import sacc.models.User;
 
 import javax.servlet.ServletException;
@@ -27,13 +30,26 @@ public class InitUsersQueue extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
-        for (int index =100; index < 1000; index++){
-            String res = _gson.toJson(new User("077779"+index,"florian.ainadou"+index+"@gmail.com", false));
-            Queue queue = QueueFactory.getDefaultQueue();         //getQueue("users-queue");
+        Queue queue = QueueFactory.getDefaultQueue();
+        for (int index =100; index < 300; index++){
+            String res = _gson.toJson(new User("077779"+index,"florian.ainadou"+index+"@gmail.com", false, new Location(40.1f+index, 40.2f+index)));
+            System.out.println(res);
             queue.add(TaskOptions.Builder.withUrl("/user").payload(res));
+
         }
 
+        String res2 = _gson.toJson(new Admin("Paul", "pkoffi5@gmail.com"));
+        queue.add(TaskOptions.Builder.withUrl("/admin").payload(res2));
+
+        for (int index =100; index < 200; index++){
+
+            String res3= _gson.toJson(new Proximity("077779"+index, "077779"+(index+1), new Location(45.1f+index, 47.2f+index),  new Location(45.1f+index, 47.2f+index)));
+            queue.add(TaskOptions.Builder.withUrl("/user").payload(res3));
+
+        }
+
+
+        response.getWriter().print("Done");
 
     }
 }
