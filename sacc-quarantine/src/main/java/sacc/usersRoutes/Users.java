@@ -31,7 +31,6 @@ import static sacc.mocks.Statistiques.incrementNumberOfUser;
 
 
 @WebServlet(name = "user",
-        description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/user"
 )
 public class Users extends HttpServlet {
@@ -39,14 +38,7 @@ public class Users extends HttpServlet {
     private Gson _gson = null;
 
     public Users() throws IOException {
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(credentials)
-                .setProjectId("sacc-quarantine")
-                .build();
-        FirebaseApp.initializeApp(options);
-
-        db = FirestoreClient.getFirestore();
+        connectToDatabase();
     }
 
 
@@ -168,4 +160,19 @@ public class Users extends HttpServlet {
         out.print(obj.toString());
         out.flush();
     }
+
+    private void connectToDatabase() throws IOException {
+        if (FirebaseApp.getApps().isEmpty()) {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .setProjectId("sacc-quarantine")
+                    .build();
+            FirebaseApp.initializeApp(options);
+        }else{
+            FirebaseApp.getInstance();
+        }
+        db = FirestoreClient.getFirestore();
+    }
+
 }
