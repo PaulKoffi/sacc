@@ -3,10 +3,7 @@ package sacc.proximityMessage;
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -23,6 +20,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -35,14 +33,7 @@ public class ProximityMsg extends HttpServlet {
     private Gson _gson = null;
 
     public ProximityMsg() throws IOException {
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(credentials)
-                .setProjectId("sacc-quarantine")
-                .build();
-        FirebaseApp.initializeApp(options);
-
-        db = FirestoreClient.getFirestore();
+        connectToDatabase();
     }
 
     @Override
@@ -93,7 +84,7 @@ public class ProximityMsg extends HttpServlet {
                 data.put("user1CurrentLocation", proximity.getUser1CurrentLocation());
                 data.put("User2CurrentLocation", proximity.getUser2CurrentLocation());
                 data.put("user1PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()));
-                data.put("user2PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
+                data.put("user2PhoneNumber",     Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
                 SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 Date date = new Date(System.currentTimeMillis());
                 data.put("date", formatter.format(date));
@@ -101,6 +92,37 @@ public class ProximityMsg extends HttpServlet {
                 ApiFuture<WriteResult> result = docRef.set(data);
             }
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ApiFuture<QuerySnapshot> result = db.collection("proximity").get();
+        List<QueryDocumentSnapshot> documents = null;
+        try {
+            documents= result.get().getDocuments();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        if (documents!=null){
+            for (DocumentSnapshot document : documents) {
+                document.getReference().delete();
+            }
+        }
+
+    }
+
+    private void connectToDatabase() throws IOException {
+        if (FirebaseApp.getApps().isEmpty()) {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .setProjectId("sacc-quarantine")
+                    .build();
+            FirebaseApp.initializeApp(options);
+        }else{
+            FirebaseApp.getInstance();
+        }
+        db = FirestoreClient.getFirestore();
     }
 
 }
