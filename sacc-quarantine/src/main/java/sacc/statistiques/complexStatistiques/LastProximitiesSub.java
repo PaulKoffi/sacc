@@ -23,7 +23,7 @@ import java.util.concurrent.TimeoutException;
 public class LastProximitiesSub {
 
     private Firestore firestoreDb;
-    public List<String> userMailsList = new ArrayList<>();
+    private List<String> userMailsList = new ArrayList<>();
     LastProximitiesSub() throws IOException {
         connectToDatabase();
     }
