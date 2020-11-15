@@ -53,6 +53,10 @@ public class ProximityADayAgo extends HttpServlet {
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
             lastProximitiesSub.subscribeAsyncExample(projectId);
+            //lastProximitiesSub.getUserMailsList();
+            /**
+             * Mettre ton code ici
+             */
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } finally {
