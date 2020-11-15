@@ -22,7 +22,9 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+
 @WebServlet(name = "users",
+
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/users"
 )
@@ -66,6 +68,9 @@ public class Users extends HttpServlet {
         data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
 
         ApiFuture<WriteResult> result = docRef.set(data);
+        //incrementNumberOfUser();
+// ...
+// result.get() blocks on response
 
         try {
             System.out.println("Update time : " + result.get().getUpdateTime());

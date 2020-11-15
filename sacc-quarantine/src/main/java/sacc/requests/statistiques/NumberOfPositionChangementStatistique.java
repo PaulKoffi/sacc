@@ -1,6 +1,7 @@
 package sacc.requests.statistiques;
 
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import sacc.mocks.Statistiques;
 import sacc.models.Statistique;
 
 import javax.servlet.annotation.WebServlet;
@@ -19,9 +20,9 @@ public class NumberOfPositionChangementStatistique extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        Statistique statistique = new Statistique("number of positions changements", 100);
+        Statistiques statistiques = new Statistiques();
 
-        sendAsJson(response,statistique);
+        sendAsJson(response,statistiques.getnumberOfPositionChangementStatistique());
     }
 
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
