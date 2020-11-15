@@ -18,7 +18,7 @@ import java.io.IOException;
         description = "taskqueue: Enqueue a two positions with a key",
         urlPatterns = "/taskqueue/addPersonOfInterest"
 )
-public class addPersonOfInterest extends HttpServlet {
+public class AddPersonOfInterest extends HttpServlet {
     private Gson _gson = null;
 
     @Override
