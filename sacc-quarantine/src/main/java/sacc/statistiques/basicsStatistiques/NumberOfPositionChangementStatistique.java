@@ -9,6 +9,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import sacc.models.Statistique;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -51,7 +52,8 @@ public class NumberOfPositionChangementStatistique extends HttpServlet {
             System.out.println("No such document!");
         }
 
-        sendAsJson(response, Objects.requireNonNull(document.getData()).get("numberOfPositionChangement"));
+        Statistique statistique = new Statistique("number of position changement", Math.toIntExact((Long) Objects.requireNonNull(document.getData()).get("numberOfPositionChangement")));
+        sendAsJson(response, Objects.requireNonNull(statistique));
     }
 
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
