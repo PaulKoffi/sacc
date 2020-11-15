@@ -5,4 +5,16 @@
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
     </system-properties>
+
+    <!--Automatic scaling-->
+    <application>sacc-quarantine</application>
+    <module>default</module>
+    <version>uno</version>
+    <instance-class>F2</instance-class>
+    <automatic-scaling>
+        <target-cpu-utilization>0.5</target-cpu-utilization>
+        <min-instances>1</min-instances>
+        <max-instances>5</max-instances>
+        <max-concurrent-requests>50</max-concurrent-requests>
+    </automatic-scaling>
 </appengine-web-app>
