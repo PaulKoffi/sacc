@@ -2,10 +2,13 @@ package sacc.statistiques.complexStatistiques;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.TopicName;
+import sacc.utils.Sha1Hash;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -52,7 +55,7 @@ public class ProximityADayAgo extends HttpServlet {
             String messageId = messageIdFuture.get();
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
-            lastProximitiesSub.subscribeAsyncExample(projectId);
+            lastProximitiesSub.subscribeAsyncExample(projectId,payload);
             //lastProximitiesSub.getUserMailsList();
             /**
              * Mettre ton code ici

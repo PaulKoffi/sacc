@@ -11,6 +11,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
+import sacc.utils.Sha1Hash;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -28,7 +29,7 @@ public class LastProximitiesSub {
         connectToDatabase();
     }
 
-    void subscribeAsyncExample(String projectId) {
+    void subscribeAsyncExample(String projectId, String emailAdmin) {
         ProjectSubscriptionName subscriptionName =
                 ProjectSubscriptionName.of(projectId, "lastPoiProximityStats");
 
@@ -45,15 +46,17 @@ public class LastProximitiesSub {
             subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
             // Start the subscriber.
             subscriber.startAsync().awaitRunning();
-            List<DocumentReference> docs = filterByDate();
-            Set<String> usersMail = checkProximity(docs);
-            userMailsList.addAll(usersMail);
-            /**
-             * c'est ici que tu dois copier le truc dans le fichier dans une fonction
-             * pour après upload dans le cloudsotre
-             */
-            // Allow the subscriber to run for 30s unless an unrecoverable error occurs.
-            subscriber.awaitTerminated(10, TimeUnit.SECONDS);
+            if (checkIfAdmin(emailAdmin)){
+                List<DocumentReference> docs = filterByDate();
+                Set<String> usersMail = checkProximity(docs);
+                userMailsList.addAll(usersMail);
+                /**
+                 * c'est ici que tu dois copier le truc dans le fichier dans une fonction
+                 * pour après upload dans le cloudsotre
+                 */
+                // Allow the subscriber to run for 30s unless an unrecoverable error occurs.
+                subscriber.awaitTerminated(10, TimeUnit.SECONDS);
+            }
         } catch (TimeoutException | IOException timeoutException) {
             // Shut down the subscriber after 30s. Stop receiving messages.
             subscriber.stopAsync();
@@ -189,5 +192,21 @@ public class LastProximitiesSub {
 
     public List<String> getUserMailsList() {
         return userMailsList;
+    }
+
+    private boolean checkIfAdmin(String emailAdmin){
+
+        DocumentReference docRefAdmin = firestoreDb.collection("admins").document(Sha1Hash.encryptThisString(emailAdmin));
+
+        ApiFuture<DocumentSnapshot> future = docRefAdmin.get();
+
+        DocumentSnapshot document = null;
+        try {
+            document = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println(document != null);
+        return document != null;
     }
 }
