@@ -70,19 +70,11 @@ public class Users extends HttpServlet {
         DocumentReference docRef = db.collection("users").document(Sha1Hash.encryptThisString(phoneNumber));
         Map<String, Object> data = new HashMap<>();
         if (user.getEmail() != null) data.put("email", user.getEmail());
-        if (user.getPersonOfInterest()!=null) data.put("personOfInterest", user.getPersonOfInterest());
-        if (!user.getNumber().equals(""))data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
+        if (user.getPersonOfInterest() != null) data.put("personOfInterest", user.getPersonOfInterest());
+        if (!user.getNumber().equals("")) data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
 
         ApiFuture<WriteResult> result = docRef.set(data);
 //        incrementNumberOfUser();
-// ...
-// result.get() blocks on response
-
-        try {
-            System.out.println("Update time : " + result.get().getUpdateTime());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
