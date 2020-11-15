@@ -18,10 +18,10 @@ import java.io.PrintWriter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static sacc.statistiques.complexStatistiques.LastProximitiesSub.subscribeAsyncExample;
-
 @WebServlet(name="ProximityADayAgo", urlPatterns = "/last24hours")
 public class ProximityADayAgo extends HttpServlet {
+
+    private LastProximitiesSub lastProximitiesSub = new LastProximitiesSub();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,7 +50,7 @@ public class ProximityADayAgo extends HttpServlet {
             System.out.println("Published message ID: " + messageId);
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
-            subscribeAsyncExample(projectId, "lastPoiProximityStats");
+            lastProximitiesSub.subscribeAsyncExample(projectId);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } finally {
