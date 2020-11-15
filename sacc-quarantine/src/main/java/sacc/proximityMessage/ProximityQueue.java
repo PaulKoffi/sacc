@@ -33,8 +33,8 @@ public class ProximityQueue extends HttpServlet {
         String payload = buffer.toString();
 
 
-        Queue queue = QueueFactory.getQueue("users-queue");
-        queue.add(TaskOptions.Builder.withUrl("/users").payload(payload));
+        Queue queue = QueueFactory.getDefaultQueue();     //getQueue("proximity-queue");
+        queue.add(TaskOptions.Builder.withUrl("/sendProximityMsg").payload(payload));
 
         PrintWriter out = response.getWriter();
         out.print("Done");

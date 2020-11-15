@@ -9,7 +9,7 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import sacc.models.User;
+import sacc.models.Proximity;
 import sacc.utils.Sha1Hash;
 
 import javax.servlet.ServletException;
@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,15 +56,19 @@ public class ProximityMsg extends HttpServlet {
 
         Gson gson = new Gson();
 
-        User user = gson.fromJson(payload, User.class);
+        Proximity proximity = gson.fromJson(payload, Proximity.class);
 
-        String phoneNumber = user.getNumber();
+        String id = Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()+proximity.getUser2PhoneNumber());
 
-        DocumentReference docRef = db.collection("users").document(Sha1Hash.encryptThisString(phoneNumber));
+        DocumentReference docRef = db.collection("proximity").document(Sha1Hash.encryptThisString(id));
         Map<String, Object> data = new HashMap<>();
-        data.put("email", user.getEmail());
-        data.put("personOfInterest", user.getPersonOfInterest());
-        data.put("phoneNumber", Sha1Hash.encryptThisString(phoneNumber));
+        data.put("user1CurrentLocation", proximity.getUser1CurrentLocation());
+        data.put("User2CurrentLocation", proximity.getUser2CurrentLocation());
+        data.put("user1PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser1PhoneNumber()));
+        data.put("user2PhoneNumber", Sha1Hash.encryptThisString(proximity.getUser2PhoneNumber()));
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        data.put("date",formatter.format(date));
 
         ApiFuture<WriteResult> result = docRef.set(data);
         incrementNumberOfUser();
