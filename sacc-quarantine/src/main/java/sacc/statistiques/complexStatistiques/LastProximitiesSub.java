@@ -45,7 +45,11 @@ public class LastProximitiesSub {
             // Start the subscriber.
             subscriber.startAsync().awaitRunning();
             List<DocumentReference> docs = filterByDate();
-            checkProximity(docs);
+            Set<String> usersMail = checkProximity(docs);
+            /**
+             * c'est ici que tu dois copier le truc dans le fichier dans une fonction
+             * pour après upload dans le cloudsotre
+             */
             // Allow the subscriber to run for 30s unless an unrecoverable error occurs.
             subscriber.awaitTerminated(10, TimeUnit.SECONDS);
         } catch (TimeoutException | IOException timeoutException) {
