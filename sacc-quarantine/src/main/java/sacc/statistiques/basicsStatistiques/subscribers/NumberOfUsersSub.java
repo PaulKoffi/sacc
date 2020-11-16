@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 public class NumberOfUsersSub {
 
     private Firestore firestoreDb;
-    private int numberOfUsers = 0;
+    private int numberOfUsers;
 
     public NumberOfUsersSub() throws IOException {
         connectToDatabase();
@@ -49,6 +49,7 @@ public class NumberOfUsersSub {
     }
 
     public void subscribeAsyncExample(String projectId) {
+        numberOfUsers = 0;
         ProjectSubscriptionName subscriptionName =
                 ProjectSubscriptionName.of(projectId, "numberOfUsersStatsSub");
 
@@ -81,6 +82,7 @@ public class NumberOfUsersSub {
                             }
                         });
                         Statistique statistique = new Statistique("number of users", numberOfUsers);
+                        System.out.println(numberOfUsers);
                         /**
                          * c'est ici que tu mets ton code pour le mail
                          */
