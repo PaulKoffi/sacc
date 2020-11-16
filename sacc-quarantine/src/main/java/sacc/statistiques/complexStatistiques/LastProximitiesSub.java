@@ -260,8 +260,13 @@ public class LastProximitiesSub {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println(document != null);
-        return document != null;
+        assert document != null;
+        if (document.exists()) {
+            return true;
+        } else {
+            System.out.println("No such document!");
+        }
+        return false;
     }
 
     private String createAndUpload(ArrayList<String> list)

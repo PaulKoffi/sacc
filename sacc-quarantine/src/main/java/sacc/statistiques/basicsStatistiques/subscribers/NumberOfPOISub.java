@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
 
 public class NumberOfPOISub {
     private Firestore firestoreDb;
-    private int numberOfPOI = 0;
+    private int numberOfPOI;
 
     public NumberOfPOISub() throws IOException {
         connectToDatabase();
@@ -54,6 +54,7 @@ public class NumberOfPOISub {
     }
 
     public void subscribeAsyncExample(String projectId) {
+        numberOfPOI = 0;
         ProjectSubscriptionName subscriptionName =
                 ProjectSubscriptionName.of(projectId, "numberOfPOIStatsSub");
 
@@ -66,8 +67,6 @@ public class NumberOfPOISub {
                         Iterable<DocumentReference> docRef = firestoreDb.collection("users").listDocuments();
                         docRef.forEach(documentReference -> {
                             ApiFuture<DocumentSnapshot> future = documentReference.get();
-// ...
-// future.get() blocks on response
                             DocumentSnapshot document = null;
                             try {
                                 document = future.get();
@@ -133,10 +132,14 @@ public class NumberOfPOISub {
         DocumentSnapshot document = null;
         try {
             document = future.get();
-            System.out.println(document != null);
-            return document != null;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+        }
+        assert document != null;
+        if (document.exists()) {
+            return true;
+        } else {
+            System.out.println("No such document!");
         }
         return false;
     }
