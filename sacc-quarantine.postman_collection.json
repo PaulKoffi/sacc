@@ -1,0 +1,394 @@
+{
+	"info": {
+		"_postman_id": "6a687bfd-368b-4948-88ea-2def652a2878",
+		"name": "sacc-quarantine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "add an admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"florain.ainadou97@gmail.com\",\n    \"name\": \"Djodjo\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/admin",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set an existant user as a person of interest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phoneNumber\" : \"077779127\",\n    \"personOfInterest\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/addPersonOfInterest",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"addPersonOfInterest"
+					]
+				},
+				"description": "Phone numbers examples fter init: 077779127 - 077779299"
+			},
+			"response": []
+		},
+		{
+			"name": "clean database",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/clean",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"clean"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "send a proximity message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user1PhoneNumber\": \"077779127\",\n    \"user2PhoneNumber\": \"077779128\",\n    \"user1CurrentLocation\": {\n        \"longitude\" : 44.5,\n        \"latitude\" : 44.4\n    },\n    \"user2CurrentLocation\": {\n        \"longitude\" : 44.5,\n        \"latitude\" : 44.4\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/sendProximityMsg",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"sendProximityMsg"
+					]
+				},
+				"description": "We direcly add user phone m=number here because it is easiet for test. There are encrypted in the backend"
+			},
+			"response": []
+		},
+		{
+			"name": "init database",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/initUsers",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"initUsers"
+					]
+				},
+				"description": "Adding 200 people \n2 admins \n100 Proximity messages"
+			},
+			"response": []
+		},
+		{
+			"name": "changing user position",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phoneNumber\":\"077779127\",\n    \"location\": {\n        \"longitude\" : 44.5,\n        \"latitude\" : 44.4\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/changePosition",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"changePosition"
+					]
+				},
+				"description": "change position of an user giving his phone number (Without sha1 encryption)"
+			},
+			"response": []
+		},
+		{
+			"name": "get a specific user giving his original number",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/user?phoneNumber=087779127",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"user"
+					],
+					"query": [
+						{
+							"key": "phoneNumber",
+							"value": "087779127"
+						}
+					]
+				},
+				"description": "users after init number between 077779100 - 077779299"
+			},
+			"response": []
+		},
+		{
+			"name": "get an admin giving his mail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/admin?email=florain.ainadou97@gmail.com",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"admin"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "florain.ainadou97@gmail.com"
+						}
+					]
+				},
+				"description": "get admin giving his mail\n"
+			},
+			"response": []
+		},
+		{
+			"name": "numberOfPOI",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "koffixxxx@gmail.com",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/statistiques/numberOfPOI",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"statistiques",
+						"numberOfPOI"
+					]
+				},
+				"description": "Get by email the number of person of interest"
+			},
+			"response": []
+		},
+		{
+			"name": "numberOfPositionChangement",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "koffixxxx@gmail.com"
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/statistiques/numberOfPositionChangement",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"statistiques",
+						"numberOfPositionChangement"
+					]
+				},
+				"description": "Get by email the number of changement of position"
+			},
+			"response": []
+		},
+		{
+			"name": "numberOfUsers",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "koffixxxx@gmail.com"
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/statistiques/numberOfUsers ",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"statistiques",
+						"numberOfUsers "
+					]
+				},
+				"description": "Get by email the number of users"
+			},
+			"response": []
+		},
+		{
+			"name": "last24hours",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "koffixxxx@gmail.com"
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/last24hours",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"last24hours"
+					]
+				},
+				"description": "Get by email the number of person nearby person of interest in the last 24 Hours"
+			},
+			"response": []
+		},
+		{
+			"name": "add user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"phoneNumber\":\"087779128\",\n    \"email\": \"blackmail@gmail.com\",\n    \"location\": {\n       \"longitude\" : 44.5,\n       \"latitude\" : 44.4\n   }\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sacc-quarantine.nw.r.appspot.com/taskqueue/user",
+					"protocol": "https",
+					"host": [
+						"sacc-quarantine",
+						"nw",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"taskqueue",
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
