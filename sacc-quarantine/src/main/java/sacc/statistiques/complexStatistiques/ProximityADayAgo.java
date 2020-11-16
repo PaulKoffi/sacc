@@ -74,6 +74,8 @@ public class ProximityADayAgo extends HttpServlet {
             }
         }
     }
+
+
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
         Gson _gson = new Gson();
         response.setContentType("application/json");
