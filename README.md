@@ -21,7 +21,8 @@
   </p>
   
  ## Compte rendu du projet
- Le compte rendu du projet se trouve 👉 [ici](https://docs.google.com/document/d/1zPnzFt1AAtaH-RedQ0Z2q4z4xp3GpVwdAaoLgQ_mo2s/edit?usp=sharing)   
+ Le compte rendu du projet se trouve 👉 [ici](https://docs.google.com/document/d/1zPnzFt1AAtaH-RedQ0Z2q4z4xp3GpVwdAaoLgQ_mo2s/edit?usp=sharing)  
+ 
  
  ## Spécificités des services utilisés
  * Cloud Storage : le nom du bucket utilisé est bucket_quarantine
@@ -34,6 +35,7 @@
   
   ## Récupération du projet
   Effectuer un clone classique du projet en faisant ```git clone https://github.com/wak-nda/sacc.git``` ou en récupérant le zip depuis cette page.
+  Le fichier postman est preésent ici https://github.com/wak-nda/sacc/blob/main/sacc-quarantine.postman_collection.json
   
   ## Compilation & Exécution & Déploiement 
   1. Exécuter ```mvn clean install``` pour compiler le projet et installer toutes les dépendances requises
