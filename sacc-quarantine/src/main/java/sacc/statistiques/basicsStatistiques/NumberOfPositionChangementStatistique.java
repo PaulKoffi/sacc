@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-@WebServlet(name = "NumberOfPositionChangementStatistique", value = "/statistiques/NumberOfPositionChangement")
+@WebServlet(name = "NumberOfPositionChangementStatistique", value = "/statistiques/numberOfPositionChangement")
 public class NumberOfPositionChangementStatistique extends HttpServlet {
 
     private Gson _gson = new Gson();

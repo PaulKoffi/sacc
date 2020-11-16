@@ -24,12 +24,13 @@ import java.util.concurrent.TimeoutException;
 public class LastProximitiesSub {
 
     private Firestore firestoreDb;
-    private List<String> userMailsList = new ArrayList<>();
+    private List<String> userMailsList;
     LastProximitiesSub() throws IOException {
         connectToDatabase();
     }
 
-    void subscribeAsyncExample(String projectId, String emailAdmin) {
+    void subscribeAsyncExample(String projectId) {
+        this.userMailsList = new ArrayList<>();
         ProjectSubscriptionName subscriptionName =
                 ProjectSubscriptionName.of(projectId, "lastPoiProximityStats");
 
@@ -37,7 +38,18 @@ public class LastProximitiesSub {
         MessageReceiver receiver =
                 (PubsubMessage message, AckReplyConsumer consumer) -> {
                     // Handle incoming message, then ack the received message.
+                    System.out.println(message.getData().toStringUtf8());
                     System.out.println("Id: " + message.getMessageId());
+                    if (checkIfAdmin(message.getData().toStringUtf8())) {
+                        List<DocumentReference> docs = null;
+                        try {
+                            docs = filterByDate();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Set<String> usersMail = checkProximity(Objects.requireNonNull(docs));
+                        userMailsList.addAll(usersMail);
+                    }
                     consumer.ack();
                 };
 
@@ -46,18 +58,15 @@ public class LastProximitiesSub {
             subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
             // Start the subscriber.
             subscriber.startAsync().awaitRunning();
-            if (checkIfAdmin(emailAdmin)){
-                List<DocumentReference> docs = filterByDate();
-                Set<String> usersMail = checkProximity(docs);
-                userMailsList.addAll(usersMail);
+
                 /**
                  * c'est ici que tu dois copier le truc dans le fichier dans une fonction
                  * pour après upload dans le cloudsotre
                  */
                 // Allow the subscriber to run for 30s unless an unrecoverable error occurs.
                 subscriber.awaitTerminated(10, TimeUnit.SECONDS);
-            }
-        } catch (TimeoutException | IOException timeoutException) {
+
+        } catch (TimeoutException timeoutException) {
             // Shut down the subscriber after 30s. Stop receiving messages.
             subscriber.stopAsync();
         }
