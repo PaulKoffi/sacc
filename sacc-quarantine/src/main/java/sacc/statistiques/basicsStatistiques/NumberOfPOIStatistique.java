@@ -6,11 +6,16 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.pubsub.v1.Publisher;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.GsonBuilder;
+import com.google.protobuf.ByteString;
+import com.google.pubsub.v1.PubsubMessage;
+import com.google.pubsub.v1.TopicName;
 import sacc.models.Statistique;
+import sacc.statistiques.basicsStatistiques.subscribers.NumberOfPOISub;
 import sacc.utils.Sha1Hash;
 
 import javax.servlet.annotation.WebServlet;
@@ -23,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @WebServlet(name = "NumberOfPOIStatistique", value = "/statistiques/numberOfPOI")
 public class NumberOfPOIStatistique extends HttpServlet {
@@ -30,49 +36,54 @@ public class NumberOfPOIStatistique extends HttpServlet {
     private Gson _gson = new Gson();
     private Firestore firestoreDb;
     private int numberOfPOI = 0;
-    public NumberOfPOIStatistique() {
+    private NumberOfPOISub numberOfPOISub = new NumberOfPOISub();
+    public NumberOfPOIStatistique() throws IOException {
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        connectToDatabase();
 
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String payload = buffer.toString();
+        Publisher publisher = null;
+        String topicId = "numberOfPOIStats";
+        String projectId = "sacc-quarantine";
+        TopicName topicName = TopicName.of(projectId, topicId);
+        try {
+            // create a publisher on the topic
+            publisher = Publisher.newBuilder(topicName).build();
+            // construct a pubsub message from the payload
+            StringBuilder buffer = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+            String payload = buffer.toString();
+            ByteString data = ByteString.copyFromUtf8(payload);
+            PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
 
-        if(checkIfAdmin(payload)){
-            Iterable<DocumentReference> docRef = firestoreDb.collection("users").listDocuments();
-            docRef.forEach(documentReference -> {
-                ApiFuture<DocumentSnapshot> future = documentReference.get();
-// ...
-// future.get() blocks on response
-                DocumentSnapshot document = null;
+            // Once published, returns a server-assigned message id (unique within the topic)
+            ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
+            String messageId = messageIdFuture.get();
+            // redirect to home page
+            sendAsJson(response,response.getStatus());
+            numberOfPOISub.subscribeAsyncExample(projectId);
+            //lastProximitiesSub.getUserMailsList();
+            /**
+             * Mettre ton code ici
+             */
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            if (publisher != null) {
+                // When finished with the publisher, shutdown to free up resources.
+                publisher.shutdown();
                 try {
-                    document = future.get();
-                } catch (InterruptedException | ExecutionException e) {
+                    publisher.awaitTermination(1, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                assert document != null;
-                if (document.exists()) {
-                    Map<String, Object> map = document.getData();
-                    assert map != null;
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        if(entry.getValue().equals(true)){
-                            numberOfPOI++;
-                        }
-                    }
-                } else {
-                    System.out.println("No such document!");
-                }
-            });
-            Statistique statistique = new Statistique("number of POI", numberOfPOI);
-            sendAsJson(response, Objects.requireNonNull(statistique));
+            }
         }
     }
 
@@ -82,35 +93,5 @@ public class NumberOfPOIStatistique extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.print(res);
         out.flush();
-    }
-
-    private void connectToDatabase() throws IOException {
-        if (FirebaseApp.getApps().isEmpty()) {
-            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(credentials)
-                    .setProjectId("sacc-quarantine")
-                    .build();
-            FirebaseApp.initializeApp(options);
-        }else{
-            FirebaseApp.getInstance();
-        }
-        firestoreDb = FirestoreClient.getFirestore();
-    }
-
-    private boolean checkIfAdmin(String emailAdmin){
-
-        DocumentReference docRefAdmin = firestoreDb.collection("admins").document(Sha1Hash.encryptThisString(emailAdmin));
-
-        ApiFuture<DocumentSnapshot> future = docRefAdmin.get();
-
-        DocumentSnapshot document = null;
-        try {
-            document = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        System.out.println(document != null);
-        return document != null;
     }
 }

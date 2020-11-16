@@ -107,6 +107,12 @@
       <version>1.10.19</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.mailjet</groupId>
+      <artifactId>mailjet-client</artifactId>
+      <version>4.2.0</version>
+    </dependency>
   </dependencies>
 
   <build>

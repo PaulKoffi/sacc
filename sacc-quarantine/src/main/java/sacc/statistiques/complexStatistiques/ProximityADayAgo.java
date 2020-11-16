@@ -55,7 +55,7 @@ public class ProximityADayAgo extends HttpServlet {
             String messageId = messageIdFuture.get();
             // redirect to home page
             sendAsJson(resp,resp.getStatus());
-            lastProximitiesSub.subscribeAsyncExample(projectId,payload);
+            lastProximitiesSub.subscribeAsyncExample(projectId);
             //lastProximitiesSub.getUserMailsList();
             /**
              * Mettre ton code ici
@@ -74,6 +74,8 @@ public class ProximityADayAgo extends HttpServlet {
             }
         }
     }
+
+
     private void sendAsJson( HttpServletResponse response, Object obj) throws IOException {
         Gson _gson = new Gson();
         response.setContentType("application/json");
