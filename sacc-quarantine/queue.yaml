@@ -1,0 +1,16 @@
+queue:
+  - name: users-queue
+    rate: 20/s
+    max_concurrent_requests: 20
+
+  - name: proximity-queue
+    rate: 20/s
+    max_concurrent_requests: 20
+
+  - name: users-queue-for-test
+    rate: 20/s
+    max_concurrent_requests: 20
+
+  - name: admins-queue
+    rate: 20/s
+    max_concurrent_requests: 20
