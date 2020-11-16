@@ -22,7 +22,11 @@
   
  ## Compte rendu du projet
  Le compte rendu du projet se trouve 👉 [ici](https://docs.google.com/document/d/1zPnzFt1AAtaH-RedQ0Z2q4z4xp3GpVwdAaoLgQ_mo2s/edit?usp=sharing)   
-  
+ 
+ ## Spécificités des services utilisés
+ * Cloud Storage : le nom du bucket utilisé est bucket_quarantine
+ * Mailing : Pour l'envoi de mail, nous avons utilisé une api mail appelée **mailjet** qui fonctionne avec AppEngine. Les mails sont ainsi reçus dans l'onglet **Promotions** de sa boîte de réception Gmail.
+ 
  ## Comment utiliser ce repository
   * La branche `master` (la branche par défaut) représente la dernière version stable du système.
   * La branche `develop` représente le système en cours de développement.
