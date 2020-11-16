@@ -45,9 +45,9 @@ public class InitUsersQueue extends HttpServlet {
         queue.add(TaskOptions.Builder.withUrl("/admin").payload(res4));
 
         for (int index =100; index < 200; index++){
-
+            Queue queue2 = QueueFactory.getQueue("proximity-queue");
             String res3= _gson.toJson(new Proximity("077779"+index, "077779"+(index+1), new Location(45.1f+index, 47.2f+index),  new Location(45.1f+index, 47.2f+index)));
-            queue.add(TaskOptions.Builder.withUrl("/user").payload(res3));
+            queue2.add(TaskOptions.Builder.withUrl("/sendProximityMsg").payload(res3));
 
         }
 
