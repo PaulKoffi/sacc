@@ -6,7 +6,7 @@
     * NABAGOU Djotiham
   
 # Vue d'ensemble
- Cette étude de cas est utilisée pour illustrer les différentes technologies impliquées dans le cours d'Architecture Orienté Services (SOA) donné à Polytech Nice - Sophia Antipolis en 5e année. Ce code de démonstration nécessite les logiciels suivants pour fonctionner correctement :
+ Cette étude de cas est utilisée pour illustrer les différentes technologies impliquées dans le cours d'Architecture logicielle pour le Cloud Computing (SACC) donné à Polytech Nice - Sophia Antipolis en 5e année. Ce code de démonstration nécessite les logiciels suivants pour fonctionner correctement :
  
    * Environnement de cloud computing : Google Cloud Platform - AppEngine
    * Langage d'implémentation : Java 8
