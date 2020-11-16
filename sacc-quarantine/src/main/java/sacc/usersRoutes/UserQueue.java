@@ -44,7 +44,7 @@ public class UserQueue extends HttpServlet {
 
 
     Queue queue = QueueFactory.getQueue("users-queue");
-    queue.add(TaskOptions.Builder.withUrl("/users").payload(payload));
+    queue.add(TaskOptions.Builder.withUrl("/user").payload(payload));
     response.getWriter().print("Done");
 
   }
