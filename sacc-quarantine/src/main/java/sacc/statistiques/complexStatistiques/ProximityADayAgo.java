@@ -2,13 +2,18 @@ package sacc.statistiques.complexStatistiques;
 
 import com.google.api.core.ApiFuture;
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.TopicName;
@@ -43,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 public class ProximityADayAgo extends HttpServlet {
 
     private LastProximitiesSub lastProximitiesSub = new LastProximitiesSub();
+    private Firestore firestoreDb;
 
     public ProximityADayAgo() throws IOException {
     }
@@ -72,19 +78,26 @@ public class ProximityADayAgo extends HttpServlet {
             ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
             String messageId = messageIdFuture.get();
             // redirect to home page
-            sendAsJson(resp,resp.getStatus());
-            lastProximitiesSub.subscribeAsyncExample(projectId,payload);
+            sendAsJson(resp, resp.getStatus());
+            lastProximitiesSub.subscribeAsyncExample(projectId, payload);
             //lastProximitiesSub.getUserMailsList();
             /**
              * Mettre ton code ici
              */
-            ArrayList<String> l = new ArrayList<>();
-            l = createFile((ArrayList<String>) lastProximitiesSub.getUserMailsList());
-            uplodadNewFileToCloudStorage(l.get(0),l.get(1));
-            String link = "https://storage.googleapis.com/bucket_quarantine/" + l.get(1);
-            String msg = "<h3>Lien vers le fichier :  <a href=" + link + ">linkToFile</a>!</h3><br />Go voir les StATS!";
-            sendMail("koffixxxx@gmail.com",msg);
-            System.out.println("DONE !");
+//            createFile2((ArrayList<String>) lastProximitiesSub.getUserMailsList());
+            connectToDatabase();
+
+            if (checkIfAdmin(payload)) {
+                System.out.println("P " + payload);
+                String l = createFile2((ArrayList<String>) lastProximitiesSub.getUserMailsList());
+//                l = createFile((ArrayList<String>) lastProximitiesSub.getUserMailsList());
+//                uplodadNewFileToCloudStorage(l.get(0), l.get(1));
+                String link = "https://storage.googleapis.com/bucket_quarantine/" + l;
+                String msg = "<h3>Lien vers le fichier :  <a href=" + link + ">linkToFile</a>!</h3><br />Go voir les StATS!";
+                sendMail(payload, msg);
+                System.out.println("DONE !");
+            }
+
 
 
         } catch (InterruptedException | ExecutionException e) {
@@ -132,19 +145,47 @@ public class ProximityADayAgo extends HttpServlet {
         writer.append("__________________FIN_________________________");
         writer.close();
         arrlist.add("src/main/java/sacc/resources/" + "STATS_" + dateFormat.format(date).replaceAll("\\s+", "") + ".txt");
-        arrlist.add("STATS_" +dateFormat.format(date).replaceAll("\\s+", "") + ".txt");
+        arrlist.add("STATS_" + dateFormat.format(date).replaceAll("\\s+", "") + ".txt");
         return arrlist;
     }
 
-    private void uplodadNewFileToCloudStorage(String path, String name) throws IOException {
+    private String createFile2(ArrayList<String> list)
+            throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+
+        String t = "STATS_" + dateFormat.format(date).replaceAll("\\s+", "");
+        // Create a temp file to upload
+        Path tempPath = Files.createTempFile(t, "txt");
+
+        String r = "Personnes ayant été en contact avec une PoI au cours des dernières 24h :" + "\n";
+
+        for (int counter = 0; counter < list.size(); counter++) {
+            r = r + list.get(counter) + "\n";
+        }
+
+        r = r + "__________________FIN_________________________";
+        Files.write(tempPath, r.getBytes());
+        File tempFile = tempPath.toFile();
         GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        BlobId blobId = BlobId.of("bucket_quarantine", name);
+        BlobId blobId = BlobId.of("bucket_quarantine", t);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
         System.out.println("Doneeeeeeeeeeee !!!!!!!!!!!!!!!!!!");
-        Path pathToFile = Paths.get(path);
-        storage.create(blobInfo, Files.readAllBytes(pathToFile));
+        storage.create(blobInfo, Files.readAllBytes(tempPath));
+        tempFile.deleteOnExit();
+        return t;
     }
+
+//    private void uplodadNewFileToCloudStorage(String path, String name) throws IOException {
+//        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+//        BlobId blobId = BlobId.of("bucket_quarantine", name);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+//        System.out.println("Doneeeeeeeeeeee !!!!!!!!!!!!!!!!!!");
+//        Path pathToFile = Paths.get(path);
+//        storage.create(blobInfo, Files.readAllBytes(pathToFile));
+//    }
 
     private void sendMail(String adminMail, String htmlMsg) {
         MailjetClient client;
@@ -175,5 +216,32 @@ public class ProximityADayAgo extends HttpServlet {
         } catch (MailjetSocketTimeoutException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean checkIfAdmin(String emailAdmin) {
+        DocumentReference docRefAdmin = firestoreDb.collection("admins").document(Sha1Hash.encryptThisString(emailAdmin));
+        ApiFuture<DocumentSnapshot> future = docRefAdmin.get();
+        DocumentSnapshot document = null;
+        try {
+            document = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println(document != null);
+        return document != null;
+    }
+
+    private void connectToDatabase() throws IOException {
+        if (FirebaseApp.getApps().isEmpty()) {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(credentials)
+                    .setProjectId("sacc-quarantine")
+                    .build();
+            FirebaseApp.initializeApp(options);
+        } else {
+            FirebaseApp.getInstance();
+        }
+        firestoreDb = FirestoreClient.getFirestore();
     }
 }
