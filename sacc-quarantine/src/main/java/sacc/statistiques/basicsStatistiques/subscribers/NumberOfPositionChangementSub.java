@@ -13,6 +13,15 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.mailjet.client.resource.Emailv31;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import sacc.models.Statistique;
 import sacc.utils.Sha1Hash;
 
@@ -85,6 +94,11 @@ public class NumberOfPositionChangementSub {
                         });
                         Statistique statistique = new Statistique("number of changement of position", numberOfPositionChangement);
                         System.out.println(numberOfPositionChangement);
+
+                        // Sending Mail
+                        String msg = "<h3>Nombre de personnes ayant changer de positions  : </h3><br />"+numberOfPositionChangement;
+                        sendMail(message.getData().toStringUtf8(), msg);
+                        System.out.println("DONEEEEEEEEE !!!");
                     }
                     consumer.ack();
                 };
@@ -120,5 +134,37 @@ public class NumberOfPositionChangementSub {
             System.out.println("No such document!");
         }
         return false;
+    }
+
+
+    private void sendMail(String adminMail, String htmlMsg) {
+        MailjetClient client;
+        MailjetRequest request;
+        MailjetResponse response;
+        client = new MailjetClient("381049ba9918bba1264fa0a8885d53ae", "2d5024c1a1cdbf4d89ec7690c3a982d5", new ClientOptions("v3.1"));
+        request = new MailjetRequest(Emailv31.resource)
+                .property(Emailv31.MESSAGES, new JSONArray()
+                        .put(new JSONObject()
+                                .put(Emailv31.Message.FROM, new JSONObject()
+                                        .put("Email", "cloudComputingWakandaGroup@paulkoffi.com")
+                                        .put("Name", "WakandaGroup"))
+                                .put(Emailv31.Message.TO, new JSONArray()
+                                        .put(new JSONObject()
+                                                .put("Email", adminMail)
+                                                .put("Name", "Admin")))
+                                .put(Emailv31.Message.SUBJECT, "STATISTIQUES SUR LE NOMBRE DE PERSONNES AYANT CHANGER DE POSITION")
+                                .put(Emailv31.Message.TEXTPART, "stats")
+                                .put(Emailv31.Message.HTMLPART, htmlMsg)
+                                .put(Emailv31.Message.CUSTOMID, "StatsMail")));
+        try {
+            response = client.post(request);
+            System.out.println(response.getStatus());
+            System.out.println(response.getData());
+            System.out.println("yes");
+        } catch (MailjetException e) {
+            e.printStackTrace();
+        } catch (MailjetSocketTimeoutException e) {
+            e.printStackTrace();
+        }
     }
 }
