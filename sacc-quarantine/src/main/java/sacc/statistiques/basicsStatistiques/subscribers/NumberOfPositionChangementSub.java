@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -111,10 +110,14 @@ public class NumberOfPositionChangementSub {
         DocumentSnapshot document = null;
         try {
             document = future.get();
-            System.out.println(document != null);
-            return document != null;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+        }
+        assert document != null;
+        if (document.exists()) {
+            return true;
+        } else {
+            System.out.println("No such document!");
         }
         return false;
     }

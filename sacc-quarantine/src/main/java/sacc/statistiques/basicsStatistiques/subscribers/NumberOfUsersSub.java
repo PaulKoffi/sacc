@@ -104,8 +104,7 @@ public class NumberOfUsersSub {
         }
     }
 
-    private boolean checkIfAdmin(String emailAdmin){
-
+    private boolean checkIfAdmin(String emailAdmin) {
         DocumentReference docRefAdmin = firestoreDb.collection("admins").document(Sha1Hash.encryptThisString(emailAdmin));
 
         ApiFuture<DocumentSnapshot> future = docRefAdmin.get();
@@ -116,6 +115,12 @@ public class NumberOfUsersSub {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return document != null;
+        assert document != null;
+        if (document.exists()) {
+            return true;
+        } else {
+            System.out.println("No such document!");
+        }
+        return false;
     }
 }
