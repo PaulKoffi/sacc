@@ -21,7 +21,7 @@
   </p>
   
  ## Compte rendu du projet
- Le compte rendu du projet se trouve 👉 [ici](../docs/sacc-quarantine-report.pdf)  
+ Le compte rendu du projet se trouve 👉 [ici](./docs/sacc-quarantine-report.pdf)  
  
  
  ## Spécificités des services utilisés
